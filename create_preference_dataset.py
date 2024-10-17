@@ -1,14 +1,14 @@
-from customdspy.colbertv2local import ColBERTv2Local
-import customdspy.tgichat
+from customdspy.colbertv2_local import ColBERTv2Local
+import customdspy.tgi_chat
 import dspy
 from customdspy.model import SingleHop, save_model
-from localevaluate import LocalEvaluate
-from custommetrics import AP_Metric
+from local_evaluate import LocalEvaluate
+from custom_metrics import AP_Metric
 from dspy.teleprompt import BootstrapFewShotWithRandomSearch
-from customdspy.hotpotretrievaldataset import HotpotRetrievalDataset
-from customdspy.hoverretrievaldataset import HoverRetrievalDataset
+from customdspy.hotpot_retrieval_dataset import HotpotRetrievalDataset
+from customdspy.hover_retrieval_dataset import HoverRetrievalDataset
 import customdspy
-from tgiserver import TGIServer
+from tgi_server import TGIServer
 import json
 from collections import defaultdict
 import random
@@ -74,7 +74,7 @@ class CreatePreferenceDataset():
             self.tgiserver = TGIServer(device_ids=tgi_device_ids, model_archive=model_archive, model_name=model_name, gpu_memory=tgi_gpu_memory)
             self.tgiserver.prepare_model()
             self.tgiserver.start(verbose=tgi_verbose)
-            self.lm = customdspy.tgichat.TGIChat(model=self.model_name, port=3002, url=f"http://localhost")
+            self.lm = customdspy.tgi_chat.TGIChat(model=self.model_name, port=3002, url=f"http://localhost")
         else:
             self.lm = dspy.Together(model=utils.get_together_model_name(self.model_name), max_tokens=1024, stop=["<|eot_id|>"], api_key=together_api_key)
 

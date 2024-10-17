@@ -1,15 +1,15 @@
 import os
 import dspy
 from dspy.evaluate import Evaluate
-from customdspy.hotpotretrievaldataset import HotpotRetrievalDataset
-from customdspy.hoverretrievaldataset import HoverRetrievalDataset
-from customdspy.tgichat import TGIChat
-from customdspy.colbertv2local import ColBERTv2Local
+from customdspy.hotpot_retrieval_dataset import HotpotRetrievalDataset
+from customdspy.hover_retrieval_dataset import HoverRetrievalDataset
+from customdspy.tgi_chat import TGIChat
+from customdspy.colbertv2_local import ColBERTv2Local
 import tqdm
 import json
 from collections import defaultdict
 from customdspy.model import SingleHop
-from custommetrics import EM_Metric, AP_Metric
+from custom_metrics import EM_Metric, AP_Metric
 
 
 class LocalEvaluate():

@@ -1,5 +1,5 @@
 import dspy
-from customdspy.retrieverwithscore import RetrieveWithScore
+from customdspy.retriever_with_score import RetrieveWithScore
 
 class SingleHop(dspy.Module):
     def process(self, passages):

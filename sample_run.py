@@ -1,9 +1,9 @@
 import os
 os.environ["HF_TOKEN"] = "YOUR_HF_TOKEN"
 
-from createpreferencedataset import CreatePreferenceDataset
+from create_preference_dataset import CreatePreferenceDataset
 import utils
-from runevals import RunEvals
+from run_evals import RunEvals
 
 
 ### Create a preference dataset, we use just 1% of the hotpotqa dataset for demonstration purposes

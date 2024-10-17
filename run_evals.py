@@ -1,8 +1,8 @@
-from localevaluate import LocalEvaluate
-from tgiserver import TGIServer
+from local_evaluate import LocalEvaluate
+from tgi_server import TGIServer
 import argparse
 import customdspy
-from customdspy.colbertv2local import ColBERTv2Local
+from customdspy.colbertv2_local import ColBERTv2Local
 import dspy
 import utils
 class RunEvals():

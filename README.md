@@ -19,9 +19,9 @@ The codebase has the option to sample LLMs using Together or locally with TGI. O
   
 ## Sampling a preference dataset
 
-To sample a preference dataset, use the CreatePreferenceDataset class defined in `createpreferencedataset.py`. Sample usage
+To sample a preference dataset, use the CreatePreferenceDataset class defined in `create_preference_dataset.py`. Sample usage
 ```
- python3 createpreferencedataset.py --model_name meta-llama/Meta-Llama-3-8B-Instruct --togher_api_key YOUR_API_KEY --out_file /MYOUTFILE/LeReT_demo/ --num_threads 64
+ python create_preference_dataset.py --model_name meta-llama/Meta-Llama-3-8B-Instruct --togher_api_key YOUR_API_KEY --out_file /MYOUTFILE/LeReT_demo/ --num_threads 64
 ```
 It is generally recommended to use Together and host ColBERT locally for the best speed. If you are recieving topk errors, the remote ColBERT server is likely overloaded. Adjust the number of threads appropriately. Generally, the num_iterations and iteration variables are used to partition the dataset into num_iterations segments and return the iteration-th segment, it does not actually run LeReT for multiple iterations. 
 ## Training a model
@@ -33,7 +33,7 @@ python -u direct-preference-optimization/train.py model=gemma-9b datasets=[PATH_
 ## Evaluating
 To evaluate your trained model and baselines, use `runevals.py`. Pass in a list of paths to model weights and strings of the form `prog:path_to_fewshot_dspy_saved_state`. 
 ```
-python tgiserver.py --models /PATH_TO_TRAINED_MODEL/LATEST,prog:/PATH_TO_FEWSHOT_DSPY_STATE.json --splits dev --dataset_name hotpotqa --model_name meta-llama/Meta-Llama-3-8B-Instruct --tgi_server
+python tgi_server.py --models /PATH_TO_TRAINED_MODEL/LATEST,prog:/PATH_TO_FEWSHOT_DSPY_STATE.json --splits dev --dataset_name hotpotqa --model_name meta-llama/Meta-Llama-3-8B-Instruct --tgi_server
 ```
 ## Full run
 A full sample run with all three steps combined can be found in `sample_run.py`.
