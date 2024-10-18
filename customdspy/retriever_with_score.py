@@ -6,6 +6,7 @@ import dsp
 from dspy.predict.parameter import Parameter
 from dspy.primitives.prediction import Prediction
 
+
 def retrieve(query: str, k: int, **kwargs) -> list[str]:
     """Retrieves passages from the RM for the query and returns the top k passages."""
     if not dsp.settings.rm:
@@ -18,18 +19,20 @@ def retrieve(query: str, k: int, **kwargs) -> list[str]:
     return passages
 
 
-def retrieveEnsemble(queries: list[str], k: int, by_prob: bool = True,**kwargs) -> list[str]:
+def retrieveEnsemble(
+    queries: list[str], k: int, by_prob: bool = True, **kwargs
+) -> list[str]:
     """Retrieves passages from the RM for each query in queries and returns the top k passages
     based on the probability or score.
     """
     queries = [q for q in queries if q]
-    
+
     if len(queries) == 1:
         return retrieve(queries[0], k, **kwargs)
 
     passages = {}
     for q in queries:
-        for psg in dsp.settings.rm(q, k=k * 3,**kwargs):
+        for psg in dsp.settings.rm(q, k=k * 3, **kwargs):
             if by_prob:
                 passages[psg.long_text] = passages.get(psg.long_text, 0.0) + psg.prob
             else:
@@ -37,7 +40,6 @@ def retrieveEnsemble(queries: list[str], k: int, by_prob: bool = True,**kwargs) 
 
     passages = [(score, text) for text, score in passages.items()]
     passages = sorted(passages, reverse=True)[:k]
-
 
     return passages
 
@@ -106,7 +108,10 @@ class RetrieveWithScore(Parameter):
             return Prediction(passages=passages)
         else:
             passages = dsp.retrieveEnsemblewithMetadata(
-                queries, k=k, by_prob=by_prob, **kwargs,
+                queries,
+                k=k,
+                by_prob=by_prob,
+                **kwargs,
             )
             if isinstance(passages[0], List):
                 pred_returns = []
@@ -128,4 +133,3 @@ class RetrieveWithScore(Parameter):
             elif isinstance(passages[0], Dict):
                 # passages dict will contain {"long_text":long_text_list,"metadatas";metadatas_list...}
                 return single_query_passage(passages=passages)
-

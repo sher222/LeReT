@@ -8,32 +8,34 @@ import torch.distributed as dist
 import inspect
 import importlib.util
 import socket
-import os
 from typing import Dict, Union, Type, List
 
 
 def get_open_port():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('', 0)) # bind to all interfaces and use an OS provided port
-        return s.getsockname()[1] # return only the port number
+        s.bind(("", 0))  # bind to all interfaces and use an OS provided port
+        return s.getsockname()[1]  # return only the port number
 
 
 def get_remote_file(remote_path, local_path=None):
-    hostname, path = remote_path.split(':')
+    hostname, path = remote_path.split(":")
     local_hostname = socket.gethostname()
-    if hostname == local_hostname or hostname == local_hostname[:local_hostname.find('.')]:
+    if (
+        hostname == local_hostname
+        or hostname == local_hostname[: local_hostname.find(".")]
+    ):
         return path
-    
+
     if local_path is None:
         local_path = path
-    # local_path = local_path.replace('/scr-ssd', '/scr')    
+    # local_path = local_path.replace('/scr-ssd', '/scr')
     if os.path.exists(local_path):
         return local_path
     local_dir = os.path.dirname(local_path)
     os.makedirs(local_dir, exist_ok=True)
 
-    print(f'Copying {hostname}:{path} to {local_path}')
-    os.system(f'scp {remote_path} {local_path}')
+    print(f"Copying {hostname}:{path} to {local_path}")
+    os.system(f"scp {remote_path} {local_path}")
     return local_path
 
 
@@ -50,7 +52,7 @@ def get_local_dir(prefixes_to_resolve: List[str]) -> str:
             return f"{prefix}/{getpass.getuser()}"
     os.makedirs(prefix)
     return f"{prefix}/{getpass.getuser()}"
-    
+
 
 def get_local_run_dir(exp_name: str, local_dirs: List[str]) -> str:
     """Create a local directory to store outputs for this run, and return its path."""
@@ -61,26 +63,42 @@ def get_local_run_dir(exp_name: str, local_dirs: List[str]) -> str:
     return run_dir
 
 
-def slice_and_move_batch_for_device(batch: Dict, rank: int, world_size: int, device: str) -> Dict:
+def slice_and_move_batch_for_device(
+    batch: Dict, rank: int, world_size: int, device: str
+) -> Dict:
     """Slice a batch into chunks, and move each chunk to the specified device."""
     chunk_size = len(list(batch.values())[0]) // world_size
     start = chunk_size * rank
     end = chunk_size * (rank + 1)
     sliced = {k: v[start:end] for k, v in batch.items()}
-    on_device = {k: (v.to(device) if isinstance(v, torch.Tensor) else v) for k, v in sliced.items()}
+    on_device = {
+        k: (v.to(device) if isinstance(v, torch.Tensor) else v)
+        for k, v in sliced.items()
+    }
     return on_device
 
 
-def pad_to_length(tensor: torch.Tensor, length: int, pad_value: Union[int, float], dim: int = -1) -> torch.Tensor:
+def pad_to_length(
+    tensor: torch.Tensor, length: int, pad_value: Union[int, float], dim: int = -1
+) -> torch.Tensor:
     if tensor.size(dim) >= length:
         return tensor
     else:
         pad_size = list(tensor.shape)
         pad_size[dim] = length - tensor.size(dim)
-        return torch.cat([tensor, pad_value * torch.ones(*pad_size, dtype=tensor.dtype, device=tensor.device)], dim=dim)
+        return torch.cat(
+            [
+                tensor,
+                pad_value
+                * torch.ones(*pad_size, dtype=tensor.dtype, device=tensor.device),
+            ],
+            dim=dim,
+        )
 
 
-def all_gather_if_needed(values: torch.Tensor, rank: int, world_size: int) -> torch.Tensor:
+def all_gather_if_needed(
+    values: torch.Tensor, rank: int, world_size: int
+) -> torch.Tensor:
     """Gather and stack/cat values from all processes, if there are multiple processes."""
     if world_size == 1:
         return values
@@ -93,8 +111,8 @@ def all_gather_if_needed(values: torch.Tensor, rank: int, world_size: int) -> to
 
 def formatted_dict(d: Dict) -> Dict:
     """Format a dictionary for printing."""
-    return {k: (f"{v:.5g}" if type(v) == float else v) for k, v in d.items()}
-    
+    return {k: (f"{v:.5g}" if type(v) is float else v) for k, v in d.items()}
+
 
 def disable_dropout(model: torch.nn.Module):
     """Disable dropout in a model."""
@@ -103,21 +121,25 @@ def disable_dropout(model: torch.nn.Module):
             module.p = 0
 
 
-def print_gpu_memory(rank: int = None, message: str = ''):
+def print_gpu_memory(rank: int = None, message: str = ""):
     """Print the amount of GPU memory currently allocated for each GPU."""
     if torch.cuda.is_available():
         device_count = torch.cuda.device_count()
         for i in range(device_count):
-            device = torch.device(f'cuda:{i}')
+            device = torch.device(f"cuda:{i}")
             allocated_bytes = torch.cuda.memory_allocated(device)
             if allocated_bytes == 0:
                 continue
-            print('*' * 40)
-            print(f'[{message} rank {rank} ] GPU {i}: {allocated_bytes / 1024**2:.2f} MB')
-        print('*' * 40)
+            print("*" * 40)
+            print(
+                f"[{message} rank {rank} ] GPU {i}: {allocated_bytes / 1024**2:.2f} MB"
+            )
+        print("*" * 40)
 
 
-def get_block_class_from_model(model: torch.nn.Module, block_class_name: str) -> torch.nn.Module:
+def get_block_class_from_model(
+    model: torch.nn.Module, block_class_name: str
+) -> torch.nn.Module:
     """Get the class of a block from a model, using the block's class name."""
     for module in model.modules():
         if module.__class__.__name__ == block_class_name:
@@ -125,14 +147,18 @@ def get_block_class_from_model(model: torch.nn.Module, block_class_name: str) ->
     raise ValueError(f"Could not find block class {block_class_name} in model {model}")
 
 
-def get_block_class_from_model_class_and_block_name(model_class: Type, block_class_name: str) -> Type:
+def get_block_class_from_model_class_and_block_name(
+    model_class: Type, block_class_name: str
+) -> Type:
     filepath = inspect.getfile(model_class)
-    assert filepath.endswith('.py'), f"Expected a .py file, got {filepath}"
+    assert filepath.endswith(".py"), f"Expected a .py file, got {filepath}"
     assert os.path.exists(filepath), f"File {filepath} does not exist"
     assert "transformers" in filepath, f"Expected a transformers model, got {filepath}"
 
-    module_name = filepath[filepath.find('transformers'):].replace('/', '.')[:-3]
-    print(f"Searching in file {filepath}, module {module_name} for class {block_class_name}")
+    module_name = filepath[filepath.find("transformers") :].replace("/", ".")[:-3]
+    print(
+        f"Searching in file {filepath}, module {module_name} for class {block_class_name}"
+    )
 
     # Load the module dynamically
     spec = importlib.util.spec_from_file_location(module_name, filepath)
@@ -145,8 +171,14 @@ def get_block_class_from_model_class_and_block_name(model_class: Type, block_cla
     return class_
 
 
-def init_distributed(rank: int, world_size: int, master_addr: str = 'localhost', port: int = 12355, backend: str = 'nccl'):
-    print(rank, 'initializing distributed')
+def init_distributed(
+    rank: int,
+    world_size: int,
+    master_addr: str = "localhost",
+    port: int = 12355,
+    backend: str = "nccl",
+):
+    print(rank, "initializing distributed")
     os.environ["MASTER_ADDR"] = master_addr
     os.environ["MASTER_PORT"] = str(port)
     dist.init_process_group(backend, rank=rank, world_size=world_size)

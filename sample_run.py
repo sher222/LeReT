@@ -1,4 +1,5 @@
 import os
+
 os.environ["HF_TOKEN"] = "YOUR_HF_TOKEN"
 
 from create_preference_dataset import CreatePreferenceDataset
@@ -7,17 +8,36 @@ from run_evals import RunEvals
 
 
 ### Create a preference dataset, we use just 1% of the hotpotqa dataset for demonstration purposes
-cp = CreatePreferenceDataset("meta-llama/Meta-Llama-3-8B-Instruct", tgi_server=False, dataset_name="hotpotqa", num_iterations=100, iteration=0, local_retriever=False, cache_dir="/iris/u/sherylh/.cache", together_api_key="YOUR_TOGETHER_KEY")
+cp = CreatePreferenceDataset(
+    "meta-llama/Meta-Llama-3-8B-Instruct",
+    tgi_server=False,
+    dataset_name="hotpotqa",
+    num_iterations=100,
+    iteration=0,
+    local_retriever=False,
+    cache_dir="/iris/u/sherylh/.cache",
+    together_api_key="YOUR_TOGETHER_KEY",
+)
 out_file = "/iris/u/sherylh/RLaIR/data/createpreferencedataset/LeReT_sample_run/"
 
-ensemble_filepaths, prompt_path = cp.generate_fewshot(canidates=3, threads=256, out_path=out_file)
+ensemble_filepaths, prompt_path = cp.generate_fewshot(
+    canidates=3, threads=256, out_path=out_file
+)
 
 for i in range(1, 3):
-    data_file = "hotpotqa" if i == 1 else out_file+f"hop{i-1}.json"
-    data = cp.make_nth_dataset(i, data_file, ensemble_filepaths, prompt_path, out_file+f"hop{i}.json", out_file+f"hop{i}_preference.json", num_threads=128)
+    data_file = "hotpotqa" if i == 1 else out_file + f"hop{i-1}.json"
+    data = cp.make_nth_dataset(
+        i,
+        data_file,
+        ensemble_filepaths,
+        prompt_path,
+        out_file + f"hop{i}.json",
+        out_file + f"hop{i}_preference.json",
+        num_threads=128,
+    )
 
-preference_files = [out_file+f"hop{i}_preference.json" for i in range(1, 3)]
-combined_dataset = cp.combine_datasets(preference_files, out_file+"combined.json")
+preference_files = [out_file + f"hop{i}_preference.json" for i in range(1, 3)]
+combined_dataset = cp.combine_datasets(preference_files, out_file + "combined.json")
 
 
 ### Train model with SFT + IPO
@@ -41,4 +61,15 @@ os.system(f"{setup_command}; {run_command}")
 prefix = f"{exp_name_prefix}_ipo"
 matching_directory = utils.find_directories_with_prefix(directory, prefix)
 models = [f"prog:{i}" for i in ensemble_filepaths] + [matching_directory]
-RunEvals(models=models, splits="dev", tgi_device_ids="unknown", model_name="meta-llama/Meta-Llama-3-8B-Instruct", gpu_memory=0.9, dataset_name="hotpotqa", cache_dir="/iris/u/sherylh/.cache", tgi_verbose=True, local_retriever=False, tgi_server=True)
+RunEvals(
+    models=models,
+    splits="dev",
+    tgi_device_ids="unknown",
+    model_name="meta-llama/Meta-Llama-3-8B-Instruct",
+    gpu_memory=0.9,
+    dataset_name="hotpotqa",
+    cache_dir="/iris/u/sherylh/.cache",
+    tgi_verbose=True,
+    local_retriever=False,
+    tgi_server=True,
+)

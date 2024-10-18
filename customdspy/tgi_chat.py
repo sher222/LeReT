@@ -1,17 +1,10 @@
-import os
 import random
-import re
-import shutil
-import subprocess
-from typing import Literal
+
 ## probably just want to open pr for tgi chat in dspy
 # from dsp.modules.adapter import TurboAdapter, DavinciAdapter, LlamaAdapter
-import backoff
 import requests
 
-from dsp.modules.cache_utils import CacheMemory, NotebookCacheMemory
 from dsp.modules.hf import HFModel, openai_to_hf
-from dsp.utils.settings import settings
 
 ERRORS = Exception
 
@@ -26,7 +19,15 @@ def backoff_hdlr(details):
 
 
 class TGIChat(HFModel):
-    def __init__(self, model, port, url="http://future-hgx-1", http_request_kwargs=None, max_tokens=512, **kwargs):
+    def __init__(
+        self,
+        model,
+        port,
+        url="http://future-hgx-1",
+        http_request_kwargs=None,
+        max_tokens=512,
+        **kwargs,
+    ):
         super().__init__(model=model, is_client=True)
         self.model = model
         self.url = url
@@ -52,20 +53,20 @@ class TGIChat(HFModel):
     def _generate(self, prompt, **kwargs):
         kwargs = {**self.kwargs, **kwargs}
         if "gemma" in self.model:
-            messages = [{
-                "role": "user",
-                "content": "You are a helpful assistant. You must continue the user text directly without *any* additional interjections." + prompt
-            }]
+            messages = [
+                {
+                    "role": "user",
+                    "content": "You are a helpful assistant. You must continue the user text directly without *any* additional interjections."
+                    + prompt,
+                }
+            ]
         else:
             messages = [
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant. You must continue the user text directly without *any* additional interjections."
+                    "content": "You are a helpful assistant. You must continue the user text directly without *any* additional interjections.",
                 },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
+                {"role": "user", "content": prompt},
             ]
         payload = {
             "stream": False,
@@ -103,13 +104,12 @@ class TGIChat(HFModel):
         try:
             json_response = response.json()
             # completions = json_response["generated_text"]
-            
-            completions = [i['message']['content'] for i in json_response["choices"]]
 
+            completions = [i["message"]["content"] for i in json_response["choices"]]
 
             response = {"prompt": prompt, "choices": [{"text": c} for c in completions]}
             return response
-        except Exception as e:
+        except Exception:
             print("Failed to parse JSON response:", response.text)
             raise Exception("Received invalid JSON response from server")
 

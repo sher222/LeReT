@@ -10,12 +10,15 @@ There are three main portions to the codebase - creating the preference dataset 
 The codebase is built on top of [DSPy](https://github.com/stanfordnlp/dspy) for setting up pipelines, [TGI](https://huggingface.co/docs/text-generation-inference/en/index) for sampling from trained models, and [Eric Mitchell's DPO codebase](https://github.com/eric-mitchell/direct-preference-optimization) for training. 
 
 ## Setup
-Create a venv with requirements listed in requirements.txt.
-
+Create a venv with requirements listed in requirements.txt, ideally with python 3.12.
+```
+conda create --name LeReT python=3.12
+pip install -r requirements.txt
+```
 Additionally, set the HF_TOKEN and WANDB_API_KEY environment variables.
 
 ## Infastructure
-The codebase has the option to sample LLMs using Together or locally with TGI. Obviously, TGI is necessary for sampling from trained models. The codebase also has the option to run ColBERTv2 locally versus query a endpoint. For large datasets, it is recommended to run the retriever locally to avoid overloading the endpoint.
+The codebase has the option to sample LLMs using Together or locally with TGI. Obviously, TGI is necessary for sampling from trained models. The codebase also has the option to run ColBERTv2 locally versus query a endpoint. For large datasets, it is recommended to run the retriever locally to avoid overloading the endpoint. To do this, download the wikipedia index from [here](https://huggingface.co/sher222/ColBERTv2-wiki2017-index/tree/main), unzip the file, and change the index_root and index_name in `customdspy/colbertv2_local.py`.
   
 ## Sampling a preference dataset
 
