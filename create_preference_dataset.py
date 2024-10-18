@@ -92,7 +92,7 @@ class CreatePreferenceDataset:
         num_iterations=1,
         iteration=0,
         tgi_device_ids="0",
-        tgi_server=True,
+        tgi_server=False,
         dataset_name="hotpotqa",
         tgi_gpu_memory=1,
         local_retriever=True,
@@ -306,7 +306,7 @@ if __name__ == "__main__":
         "--tgi_device_ids", type=str, default="0", help="Device IDs for TGI server."
     )
     parser.add_argument(
-        "--tgi_server", type=bool, default=True, help="Whether to use TGI server."
+        "--tgi_server", type=bool, default=False, help="Whether to use TGI server."
     )
     parser.add_argument(
         "--dataset_name",

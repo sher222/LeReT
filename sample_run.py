@@ -18,7 +18,7 @@ cp = CreatePreferenceDataset(
     cache_dir="/iris/u/sherylh/.cache",
     together_api_key="YOUR_TOGETHER_KEY",
 )
-out_file = "/iris/u/sherylh/RLaIR/data/createpreferencedataset/LeReT_sample_run/"
+out_file = "/your/path/LeReT_sample_run/"
 
 ensemble_filepaths, prompt_path = cp.generate_fewshot(
     canidates=3, threads=256, out_path=out_file
@@ -42,14 +42,16 @@ combined_dataset = cp.combine_datasets(preference_files, out_file + "combined.js
 
 ### Train model with SFT + IPO
 
-setup_command = "export PATH=/iris/u/sherylh/anaconda3/bin:$PATH; . activate dspy; export WANDB_API_KEY=YOUR_WANDB_KEY; export HF_TOKEN=YOUR_HF_TOKEN; cd /iris/u/sherylh/LeReT/direct-preference-optimization"
+setup_command = ". activate LeReT; export WANDB_API_KEY=YOUR_WANDB_KEY; export HF_TOKEN=YOUR_HF_TOKEN; cd /path/to/LeReT/direct-preference-optimization"
 
 exp_name_prefix = "LeReT_sample_run"
 
 run_command = f"python -u train.py model=llama3-8b datasets=[{combined_dataset}] n_epochs=1 loss=sft lr=1e-7 exp_name={exp_name_prefix}_sft trainer=FSDPTrainer sample_during_eval=false eval_every=1_000_000  do_first_eval=false debug=false wandb.project=rl-hotpotqa-finalize batch_size=8 max_prompt_length=2048 max_length=2048"
 os.system(f"{setup_command}; {run_command}")
 
-directory = "/scr/sherylh"
+directory = (
+    "/scr/username"  # check what is in direct-preference-optimization/config.yaml
+)
 prefix = f"{exp_name_prefix}_sft"
 matching_directory = utils.find_directories_with_prefix(directory, prefix)
 
@@ -68,7 +70,7 @@ RunEvals(
     model_name="meta-llama/Meta-Llama-3-8B-Instruct",
     gpu_memory=0.9,
     dataset_name="hotpotqa",
-    cache_dir="/iris/u/sherylh/.cache",
+    cache_dir="./.cache",
     tgi_verbose=True,
     local_retriever=False,
     tgi_server=True,
