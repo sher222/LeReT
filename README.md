@@ -5,7 +5,7 @@ Code for Grounding by Trying: LLMs with Reinforcement Learning-Enhanced Retrieva
 
 ## What is in this repo?
 
-There are three main portions to the codebase - creating the preference dataset as done by createpreferencedataset.py, training which is done by the direct-preference-optimization codebase, and finally evaluation done by localevaluate.py. To do this, there are quite a few custom dspy components needed and a wrapper around tgiserver which can be found in customdspy/.
+There are three main portions to the codebase - creating the preference dataset as done by createpreferencedataset.py, training which is done by the direct-preference-optimization codebase, and finally evaluation done by local_evaluate.py. To do this, there are quite a few custom dspy components needed and a wrapper around tgiserver which can be found in customdspy/.
 
 The codebase is built on top of [DSPy](https://github.com/stanfordnlp/dspy) for setting up pipelines, [TGI](https://huggingface.co/docs/text-generation-inference/en/index) for sampling from trained models, and [Eric Mitchell's DPO codebase](https://github.com/eric-mitchell/direct-preference-optimization) for training. 
 
