@@ -35,7 +35,7 @@ python -u direct-preference-optimization/train.py model=llama3-8b datasets=[PATH
 python -u direct-preference-optimization/train.py model=llama3-8b datasets=[PATH_TO_SAMPLED_DATASET.json] n_epochs=2 loss=ipo lr=1e-7 loss.beta=0.05 exp_name=gemma9b_ipo trainer=FSDPTrainer sample_during_eval=false eval_every=1_000_000  do_first_eval=false debug=false wandb.project=rl-hotpotqa-finalize batch_size=4 max_prompt_length=2048 max_length=2048 model.archive=/PATH_TO_SFT_OUTPUT/LATEST/policy.pt
 ```
 ## Evaluating
-To evaluate your trained model and baselines, use `runevals.py`. Pass in a list of paths to model weights and strings of the form `prog:path_to_fewshot_dspy_saved_state`. 
+To evaluate your trained model and baselines, use `run_evals.py`. Pass in a list of paths to model weights and strings of the form `prog:path_to_fewshot_dspy_saved_state`. 
 ```bash
 python run_evals.py --models /PATH_TO_TRAINED_MODEL/LATEST,prog:/PATH_TO_FEWSHOT_DSPY_STATE.json --splits dev --dataset_name hotpotqa --model_name meta-llama/Meta-Llama-3-8B-Instruct --cache_dir YOUR_CACHE_DIR --tgi_server --tgi_verbose 
 ```
