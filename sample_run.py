@@ -14,14 +14,14 @@ cp = CreatePreferenceDataset(
     dataset_name="hotpotqa",
     num_iterations=100,
     iteration=0,
-    local_retriever=False,
+    local_retriever=True,
     cache_dir="/iris/u/sherylh/.cache",
     together_api_key="YOUR_TOGETHER_KEY",
 )
 out_file = "/your/path/LeReT_sample_run/"
 
 ensemble_filepaths, prompt_path = cp.generate_fewshot(
-    canidates=3, threads=256, out_path=out_file
+    canidates=3, num_threads=32, out_path=out_file
 )
 
 for i in range(1, 3):
@@ -33,7 +33,7 @@ for i in range(1, 3):
         prompt_path,
         out_file + f"hop{i}.json",
         out_file + f"hop{i}_preference.json",
-        num_threads=128,
+        num_threads=32,
     )
 
 preference_files = [out_file + f"hop{i}_preference.json" for i in range(1, 3)]
@@ -62,7 +62,7 @@ os.system(f"{setup_command}; {run_command}")
 ### Evaluate model
 prefix = f"{exp_name_prefix}_ipo"
 matching_directory = utils.find_directories_with_prefix(directory, prefix)
-models = [f"prog:{i}" for i in ensemble_filepaths] + [matching_directory]
+models = [f"prog:{i}" for i in ensemble_filepaths] + [matching_directory + "/LATEST"]
 RunEvals(
     models=models,
     splits="dev",
@@ -74,4 +74,5 @@ RunEvals(
     tgi_verbose=True,
     local_retriever=False,
     tgi_server=True,
+    num_threads=16
 )

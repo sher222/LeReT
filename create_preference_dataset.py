@@ -20,7 +20,7 @@ import argparse
 class CreatePreferenceDataset:
     """This class is used to sample a preference dataset according to the prompt driven diverse sampling algorithm."""
 
-    def generate_fewshot(self, threads=20, canidates=4, file_prefix="", out_path=""):
+    def generate_fewshot(self, num_threads=20, canidates=4, file_prefix="", out_path=""):
         """generate_fewshot is called to generate few shot prompts. Saves the dspy state dict as well as extracts the prompt from the last history entry."""
         dspy.settings.configure(rm=self.retriever, lm=self.lm)
         if self.dataset_name == "hotpotqa":
@@ -46,7 +46,7 @@ class CreatePreferenceDataset:
         tp = BootstrapFewShotWithRandomSearch(
             metric=metric,
             max_bootstrapped_demos=3,
-            num_threads=threads,
+            num_threads=num_threads,
             num_candidate_programs=4 * canidates,
         )
         basicmh_bs = tp.compile(
@@ -358,7 +358,7 @@ if __name__ == "__main__":
     if num_hops is None:
         num_hops = 4 if args.dataset_name == "hover" else 2
     ensemble_filepaths, prompt_path = cp.generate_fewshot(
-        canidates=3, threads=args.num_threads, out_path=out_file
+        canidates=3, num_threads=args.num_threads, out_path=out_file
     )
 
     for i in range(1, num_hops + 1):

@@ -3,6 +3,7 @@ from tgi_server import TGIServer
 import argparse
 import customdspy
 from customdspy.colbertv2_local import ColBERTv2Local
+from customdspy.tgi_chat import TGIChat
 import dspy
 import utils
 
@@ -79,7 +80,7 @@ class RunEvals:
                 tgiserver.start(verbose=tgi_verbose)
                 print("tgi server started")
                 evaluate.update_lm(
-                    customdspy.tgichat.TGIChat(
+                    TGIChat(
                         model=model_name, port=port, url="http://localhost"
                     )
                 )
