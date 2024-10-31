@@ -1,6 +1,6 @@
 # LeReT: Learning to Retrieve by Trying
 
-Code for Grounding by Trying: LLMs with Reinforcement Learning-Enhanced Retrieval
+Code for [Grounding by Trying: LLMs with Reinforcement Learning-Enhanced Retrieval](https://arxiv.org/abs/2410.23214). 
 
 
 ## What is in this repo?
@@ -41,3 +41,11 @@ python run_evals.py --models /PATH_TO_TRAINED_MODEL/LATEST,prog:/PATH_TO_FEWSHOT
 ```
 ## Full run
 A full sample run with all three steps combined can be found in `sample_run.py`.
+## BibTeX
+```
+@misc{hsu2024groundingtryingllmsreinforcement,
+      title={Grounding by Trying: LLMs with Reinforcement Learning-Enhanced Retrieval}, 
+      author={Sheryl Hsu and Omar Khattab and Chelsea Finn and Archit Sharma},
+      year={2024}
+}
+```
